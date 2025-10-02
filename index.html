@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonics Cue Card App</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for a child-friendly look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdf4; /* Light mint background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background-color: #ffffff;
+            box-shadow: 0 10px 25px rgba(45, 212, 191, 0.3); /* Teal shadow */
+        }
+        .letter-display {
+            min-height: 18rem; /* Ensure consistent card height */
+        }
+        .btn-primary {
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .btn-primary:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container" class="w-full max-w-md p-6 mx-4 card rounded-2xl">
+        
+        <!-- Header area with Title and new Shuffle Switch -->
+        <div class="flex items-center justify-between mb-6">
+            <!-- New Shuffle Switch -->
+            <div class="flex items-center space-x-2">
+                <!-- Changed text color to teal-500 -->
+                <span class="text-sm font-bold text-teal-500">Shuffle:</span>
+                <label id="randomize-switch" class="relative inline-flex items-center cursor-pointer">
+                    <!-- Checkbox is set to 'checked' by default -->
+                    <input type="checkbox" value="" class="sr-only peer" checked>
+                    <!-- Visual switch track and handle: changed colors to teal-500 and teal-200 -->
+                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-500"></div>
+                </label>
+            </div>
+
+            <h1 class="text-3xl font-extrabold text-teal-600 text-center">
+                <span id="title-text">Letter Explorer</span>
+            </h1>
+            <div class="w-auto h-10"></div> <!-- Placeholder for balancing the header -->
+        </div>
+        <!-- End Header area -->
+
+        <!-- Letter Display Area (Glyph) -->
+        <div class="flex flex-row items-center justify-center p-8 mb-4 border-4 border-dashed rounded-xl border-teal-300">
+            <!-- Uppercase Letter -->
+            <p id="current-uppercase" class="text-[8rem] font-bold text-teal-800 mr-4 leading-none">A</p>
+            <!-- Lowercase Letter -->
+            <p id="current-lowercase" class="text-[8rem] font-black text-teal-800 leading-none">a</p>
+        </div>
+
+        <!-- NEW: Example Image/Emoji and Word Display - NOW CLICKABLE -->
+        <!-- Added 'relative' class to make absolute positioning of the icon work -->
+        <div id="example-container" class="relative text-center py-4 px-2 mb-6 bg-yellow-50 rounded-xl border border-yellow-200 cursor-pointer transition transform hover:bg-yellow-100 hover:scale-[1.01] active:scale-[0.99] active:shadow-inner">
+            <p id="example-emoji" class="text-6xl mb-2">🍎</p>
+            <p id="example-word" class="text-2xl font-bold text-teal-700 uppercase">Apple</p>
+            
+            <!-- Speaker Icon is now absolutely positioned in the top right corner -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute top-2 right-2 w-6 h-6 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/></svg>
+        </div>
+        
+        <!-- Auditory Cue Buttons (Only Name remains) -->
+        <div class="flex justify-center mb-8">
+            <!-- Listen to Name Button (Speech Bubble Icon + Text) -->
+            <button id="name-button" class="flex items-center justify-center w-full max-w-xs px-4 py-3 text-lg font-bold text-white bg-indigo-500 rounded-xl btn-primary shadow-lg shadow-indigo-300">
+                <!-- Speech Bubble Icon for speaking the name -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Name
+            </button>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="flex justify-between">
+            <button id="prev-button" class="flex items-center px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-full btn-primary hover:bg-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                Previous
+            </button>
+            <p id="counter" class="text-lg font-semibold text-gray-600 self-center">1 / 26</p>
+            <button id="next-button" class="flex items-center px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-full btn-primary hover:bg-gray-300">
+                Next
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
+        
+    </div>
+
+    <script>
+        // --- Core Application Logic ---
+        
+        // Lookup table for phonetic names to ensure TTS speaks the name correctly (Ay, Bee, Cee)
+        const letterNamesPhonetic = {
+            'A': 'Ay', 'B': 'Bee', 'C': 'Cee', 'D': 'Dee', 'E': 'Eee', 'F': 'Eff', 
+            'G': 'Gee', 'H': 'Aitch', 'I': 'Eye', 'J': 'Jay', 'K': 'Kay', 'L': 'El', 
+            'M': 'Em', 'N': 'En', 'O': 'Oh', 'P': 'Pee', 'Q': 'Queue', 'R': 'Ar', 
+            'S': 'Ess', 'T': 'Tee', 'U': 'Yoo', 'V': 'Vee', 'W': 'Double U', 
+            'X': 'Ecks', 'Y': 'Why', 'Z': 'Zee'
+        };
+
+        // This is the original, ordered data (Constant)
+        const originalAlphabetData = [
+            // Added 'emoji' property for the visual cue
+            { letter: 'a', name: 'A', soundCue: 'apple', emoji: '🍎' },
+            { letter: 'b', name: 'B', soundCue: 'ball', emoji: '⚽' },
+            { letter: 'c', name: 'C', soundCue: 'cat', emoji: '🐱' },
+            { letter: 'd', name: 'D', soundCue: 'dog', emoji: '🐶' }, 
+            { letter: 'e', name: 'E', soundCue: 'egg', emoji: '🥚' },
+            { letter: 'f', name: 'F', soundCue: 'fish', emoji: '🐠' },
+            { letter: 'g', name: 'G', soundCue: 'goat', emoji: '🐐' }, 
+            { letter: 'h', name: 'H', soundCue: 'hat', emoji: '👒' },
+            { letter: 'i', name: 'I', soundCue: 'igloo', emoji: '🛖' }, 
+            { letter: 'j', name: 'J', soundCue: 'jump', emoji: '🏃' },
+            { letter: 'k', name: 'K', soundCue: 'kite', emoji: '🪁' },
+            { letter: 'l', name: 'L', soundCue: 'lamp', emoji: '💡' },
+            { letter: 'm', name: 'M', soundCue: 'map', emoji: '🗺️' },
+            { letter: 'n', name: 'N', soundCue: 'nest', emoji: '🪺' },
+            { letter: 'o', name: 'O', soundCue: 'octopus', emoji: '🐙' },
+            { letter: 'p', name: 'P', soundCue: 'pig', emoji: '🐷' },
+            { letter: 'q', name: 'Q', soundCue: 'queen', emoji: '👸' },
+            { letter: 'r', name: 'R', soundCue: 'ring', emoji: '💍' },
+            { letter: 's', name: 'S', soundCue: 'sun', emoji: '☀️' },
+            { letter: 't', name: 'T', soundCue: 'top', emoji: '🔝' },
+            { letter: 'u', name: 'U', soundCue: 'up', emoji: '☝️' },
+            { letter: 'v', name: 'V', soundCue: 'van', emoji: '🚐' },
+            { letter: 'w', name: 'W', soundCue: 'water', emoji: '💧' },
+            { letter: 'x', name: 'X', soundCue: 'box', emoji: '📦' }, 
+            { letter: 'y', name: 'Y', soundCue: 'yoyo', emoji: '🪀' },
+            { letter: 'z', name: 'Z', soundCue: 'zebra', emoji: '🦓' },
+        ];
+        
+        // This is the working array, initialized as a copy of the original
+        let alphabet = [...originalAlphabetData]; 
+        let currentIndex = 0;
+        const totalLetters = alphabet.length;
+        // isShuffled is now true by default
+        let isShuffled = true; 
+        
+        // Variable to hold the selected female voice
+        let selectedVoice = null; 
+
+        // Updated DOM references
+        const lowercaseDisplay = document.getElementById('current-lowercase');
+        const uppercaseDisplay = document.getElementById('current-uppercase');
+        const emojiDisplay = document.getElementById('example-emoji'); 
+        const wordDisplay = document.getElementById('example-word'); 
+        
+        const nameButton = document.getElementById('name-button');
+        const exampleContainer = document.getElementById('example-container'); // NEW CLICKABLE ELEMENT
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const randomizeSwitch = document.getElementById('randomize-switch'); 
+        const randomizeCheckbox = randomizeSwitch ? randomizeSwitch.querySelector('input[type="checkbox"]') : null;
+        const counter = document.getElementById('counter');
+        
+        // --- TTS Voice Loading and Selection Logic ---
+        
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
+
+            const voices = window.speechSynthesis.getVoices();
+            
+            // 1. Try to find a specific Google English Female voice
+            selectedVoice = voices.find(
+                voice => voice.lang.includes('en') && (
+                    voice.name.includes('Google US English Female') || 
+                    voice.name.includes('Google UK English Female') ||
+                    voice.name.includes('Google UK English') 
+                )
+            );
+            
+            // 2. If not found, try to find the first English voice explicitly marked as female
+            if (!selectedVoice) {
+                selectedVoice = voices.find(
+                    voice => voice.lang.includes('en') && (voice.name.includes('Female') || voice.gender === 'female')
+                );
+            }
+            
+            // 3. Fallback: just use any English voice if a female one couldn't be guaranteed
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang.includes('en'));
+            }
+
+            if (!selectedVoice) {
+                 console.error("Could not find a suitable English voice.");
+            } else {
+                 console.log("TTS Voice selected:", selectedVoice.name);
+            }
+        }
+
+        // Load voices when the system is ready (Crucial for cross-browser compatibility)
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+
+        // Check for SpeechSynthesis API support
+        if (!('speechSynthesis' in window)) {
+            const warning = document.createElement('p');
+            warning.className = 'text-center text-red-500 mt-4 font-bold';
+            warning.textContent = 'Text-to-Speech is not fully supported in this browser environment.';
+            document.getElementById('app-container').appendChild(warning);
+        }
+
+        // Function to handle Text-to-Speech (TTS)
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            
+            // Stop any ongoing speech before starting a new one
+            window.speechSynthesis.cancel(); 
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // --- Voice assignment ---
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+            // --- End Voice assignment ---
+
+            utterance.rate = 0.8; // Slightly slower speech for clarity for a child
+            utterance.pitch = 1.2; // Slightly higher pitch to sound friendly/engaging
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Fisher-Yates (Knuth) Shuffle Algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                // Swap elements
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Function to restore the original alphabetical order
+        function resetOrder() {
+            // Copy the original data back into the working array
+            alphabet = [...originalAlphabetData];
+        }
+
+        // Function to update the UI based on the current index
+        function updateUI() {
+            const currentItem = alphabet[currentIndex];
+
+            // 1. Update the Glyphs (Letter Shapes)
+            lowercaseDisplay.textContent = currentItem.letter;
+            uppercaseDisplay.textContent = currentItem.name;
+
+            // 2. Update the Example Visual Cue (Emoji and Word)
+            emojiDisplay.textContent = currentItem.emoji;
+            wordDisplay.textContent = currentItem.soundCue.toUpperCase();
+
+            // 3. Update the Counter
+            counter.textContent = `${currentIndex + 1} / ${totalLetters}`;
+        }
+        
+        // === Initialization Logic Adjustment ===
+        // 1. If shuffle is default (which it now is via HTML 'checked'), shuffle the array immediately.
+        if (isShuffled) {
+             shuffleArray(alphabet);
+        }
+
+        // Event listener for Name button - USES PHONETIC WORD FOR CLARITY
+        nameButton.addEventListener('click', () => {
+            const letterNameVisual = alphabet[currentIndex].name; // 'A'
+            // Look up the phonetic word name: 'Ay'
+            const spokenName = letterNamesPhonetic[letterNameVisual]; 
+            speak(spokenName);
+        });
+
+        // NEW: Event listener for Example Container (clicking anywhere in the box speaks the word)
+        exampleContainer.addEventListener('click', () => {
+            const soundCue = alphabet[currentIndex].soundCue;
+            speak(soundCue);
+        });
+
+        // Event listener for Randomize Switch
+        if (randomizeSwitch) {
+            randomizeSwitch.addEventListener('click', () => {
+                // The checkbox state is flipped *before* the click event listener runs.
+                if (randomizeCheckbox.checked) {
+                    // Switch is now ON -> Activate shuffle mode
+                    shuffleArray(alphabet);
+                    isShuffled = true;
+                    speak("Shuffle mode activated.");
+                } else {
+                    // Switch is now OFF -> Restore alphabetical order
+                    resetOrder();
+                    isShuffled = false;
+                    speak("Alphabetical order restored.");
+                }
+                // Reset to the first element of the new order
+                currentIndex = 0;
+                updateUI();
+            });
+        }
+
+        // Event listeners for Navigation
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateUI();
+            } else {
+                // Wrap around to the end
+                currentIndex = totalLetters - 1;
+                updateUI();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < totalLetters - 1) {
+                currentIndex++;
+                updateUI();
+            } else {
+                // Wrap around to the beginning
+                currentIndex = 0;
+                updateUI();
+            }
+        });
+
+        // Initialize the app
+        window.onload = updateUI;
+
+    </script>
+</body>
+</html>
