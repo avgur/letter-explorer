@@ -63,16 +63,20 @@
         </div>
         <!-- End Header area -->
 
-        <!-- Letter Display Area (Glyph) -->
-        <div class="flex flex-row items-center justify-center p-8 mb-4 border-4 border-dashed rounded-xl border-teal-300">
+        <!-- Letter Display Area (Glyph) - NOW CLICKABLE TO SPEAK NAME -->
+        <!-- Added 'relative' class and the absolute positioned SVG for the icon -->
+        <div id="letter-display-container" class="relative flex flex-row items-center justify-center p-8 mb-4 border-4 border-dashed rounded-xl border-teal-300 cursor-pointer transition transform hover:bg-teal-50 hover:scale-[1.01] active:scale-[0.99] active:shadow-inner">
+            
+            <!-- Speaker Icon for Letter Name (Placed top-right) -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute top-2 right-2 w-6 h-6 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/></svg>
+
             <!-- Uppercase Letter -->
             <p id="current-uppercase" class="text-[8rem] font-bold text-teal-800 mr-4 leading-none">A</p>
             <!-- Lowercase Letter -->
             <p id="current-lowercase" class="text-[8rem] font-black text-teal-800 leading-none">a</p>
         </div>
 
-        <!-- NEW: Example Image/Emoji and Word Display - NOW CLICKABLE -->
-        <!-- Added 'relative' class to make absolute positioning of the icon work -->
+        <!-- Example Image/Emoji and Word Display - CLICKABLE TO SPEAK SOUND CUE WORD -->
         <div id="example-container" class="relative text-center py-4 px-2 mb-6 bg-yellow-50 rounded-xl border border-yellow-200 cursor-pointer transition transform hover:bg-yellow-100 hover:scale-[1.01] active:scale-[0.99] active:shadow-inner">
             <p id="example-emoji" class="text-6xl mb-2">🍎</p>
             <p id="example-word" class="text-2xl font-bold text-teal-700 uppercase">Apple</p>
@@ -81,16 +85,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="absolute top-2 right-2 w-6 h-6 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/></svg>
         </div>
         
-        <!-- Auditory Cue Buttons (Only Name remains) -->
-        <div class="flex justify-center mb-8">
-            <!-- Listen to Name Button (Speech Bubble Icon + Text) -->
-            <button id="name-button" class="flex items-center justify-center w-full max-w-xs px-4 py-3 text-lg font-bold text-white bg-indigo-500 rounded-xl btn-primary shadow-lg shadow-indigo-300">
-                <!-- Speech Bubble Icon for speaking the name -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                Name
-            </button>
-        </div>
-
         <!-- Navigation Controls -->
         <div class="flex justify-between">
             <button id="prev-button" class="flex items-center px-4 py-2 font-semibold text-gray-700 bg-gray-200 rounded-full btn-primary hover:bg-gray-300">
@@ -162,11 +156,12 @@
         // Updated DOM references
         const lowercaseDisplay = document.getElementById('current-lowercase');
         const uppercaseDisplay = document.getElementById('current-uppercase');
+        const letterDisplayContainer = document.getElementById('letter-display-container'); // New reference for clickable letter area
         const emojiDisplay = document.getElementById('example-emoji'); 
         const wordDisplay = document.getElementById('example-word'); 
         
-        const nameButton = document.getElementById('name-button');
-        const exampleContainer = document.getElementById('example-container'); // NEW CLICKABLE ELEMENT
+        // Removed reference to nameButton
+        const exampleContainer = document.getElementById('example-container'); // CLICKABLE ELEMENT for sound cue
         const prevButton = document.getElementById('prev-button');
         const nextButton = document.getElementById('next-button');
         const randomizeSwitch = document.getElementById('randomize-switch'); 
@@ -280,15 +275,15 @@
              shuffleArray(alphabet);
         }
 
-        // Event listener for Name button - USES PHONETIC WORD FOR CLARITY
-        nameButton.addEventListener('click', () => {
-            const letterNameVisual = alphabet[currentIndex].name; // 'A'
+        // NEW: Event listener for Letter Display Container - SPEAKS LETTER NAME
+        letterDisplayContainer.addEventListener('click', () => {
+            const letterNameVisual = alphabet[currentIndex].name; // e.g., 'A'
             // Look up the phonetic word name: 'Ay'
             const spokenName = letterNamesPhonetic[letterNameVisual]; 
             speak(spokenName);
         });
 
-        // NEW: Event listener for Example Container (clicking anywhere in the box speaks the word)
+        // Event listener for Example Container (clicking anywhere in the box speaks the word)
         exampleContainer.addEventListener('click', () => {
             const soundCue = alphabet[currentIndex].soundCue;
             speak(soundCue);
