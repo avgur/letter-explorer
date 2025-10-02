@@ -21,6 +21,13 @@
             background-color: #ffffff;
             box-shadow: 0 10px 25px rgba(45, 212, 191, 0.3); /* Teal shadow */
         }
+        /* Disable text selection on interactive cue card areas for cleaner mobile touch response */
+        #letter-display-container, #example-container {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
         .letter-display {
             min-height: 18rem; /* Ensure consistent card height */
         }
